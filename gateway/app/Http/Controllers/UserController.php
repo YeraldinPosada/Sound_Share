@@ -24,6 +24,8 @@ class UserController extends Controller
         $user->name = $request->name;
         $user->email = $request->email;
         $user->password = $request->password;
+        $user->question = $request->question;
+        $user->resquestion = $request->resquestion;
         $user->save();
 
         return response()->json("Usuario creado");
@@ -34,7 +36,7 @@ class UserController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if(!$user || !password_verify($request->password, $user->password)){
-            return response()->json(['Acceso denegado' => 'Credenciales invalidades']);
+            return response()->json(['Acceso denegado' => 'Credenciales invalidas']);
         }
 
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -49,6 +51,20 @@ class UserController extends Controller
     {
         $request->user()->currentAccessToken()->delete();
         return response()->json(["Message" => 'Logged out']);
+    }
+
+        public function password_reset(Request $request)
+    {
+        $user = User::where('email', $request->email)->first();
+
+        if(!$user || $user->resquestion != $request->resquestion){
+            return response()->json(["message" => "Respuesta incorrecta"]);
+        }
+
+        $user->password = $request->password;
+        $user->save();
+
+        return response()->json(["message" => "Contraseña actualizada"]);
     }
 
 
