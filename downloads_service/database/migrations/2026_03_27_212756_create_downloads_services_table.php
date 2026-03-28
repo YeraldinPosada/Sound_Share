@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('downloads_services', function (Blueprint $table) {
             $table->id();
+            $table->string('song_id'); // viene de otro microservicio
+            $table->string('user_id');
             $table->timestamps();
         });
     }
