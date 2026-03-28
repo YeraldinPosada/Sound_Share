@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('downloads_services', function (Blueprint $table) {
+        Schema::create('downloads', function (Blueprint $table) {
             $table->id();
             $table->string('song_id'); // viene de otro microservicio
             $table->string('user_id');
