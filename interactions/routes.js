@@ -4,7 +4,7 @@ const router = express.Router();
 const Like = require("./models/like");
 const Favorite = require("./models/favorite");
 
-require('dotenv').config();
+require("dotenv").config();
 
 const TOKEN_SECRETO = process.env.TOKEN_SECRETO;
 
@@ -13,16 +13,16 @@ function requireToken(req, res, next) {
     const token = req.headers["authorization"];
 
     if (token !== TOKEN_SECRETO) {
-        return res.status(403).json({ error: "No autorizado" });
+        return res.status(403).json({ error: "Unauthorized" });
     }
     next();
 }
 
-
-//Likes
-
+//likes
 router.post("/likes", requireToken, async (req, res) => {
-    const like = new Like(req.body);
+    const { user_id, song_id } = req.body;
+
+    const like = new Like({ user_id, song_id });
     await like.save();
 
     res.json({
@@ -31,45 +31,32 @@ router.post("/likes", requireToken, async (req, res) => {
     });
 });
 
-router.get("/likes", requireToken, async (req, res) => {
-    const likes = await Like.find();
+
+router.get("/likes/:song_id", requireToken, async (req, res) => {
+    const likes = await Like.find({ song_id: req.params.song_id });
+
     res.json(likes);
 });
 
-router.get("/likes/:id", requireToken, async (req, res) => {
-    const like = await Like.findById(req.params.id);
-    res.json(like);
-});
+router.delete("/likes", requireToken, async (req, res) => {
+    const { user_id, song_id } = req.body;
 
-router.put("/likes/:id", requireToken, async (req, res) => {
-    const like = await Like.findByIdAndUpdate(
-        req.params.id,
-        req.body,
-        { new: true }
-    );
-    res.json(like);
-});
+    const deleted = await Like.findOneAndDelete({ user_id, song_id });
 
-router.delete("/likes/:id", requireToken, async (req, res) => {
-    await Like.findByIdAndDelete(req.params.id);
+    if (!deleted) {
+        return res.status(404).json({ error: "Like not found" });
+    }
 
     res.json({
         message: "Like deleted"
     });
 });
 
-// Likes por canción
-router.post("/likes/song", requireToken, async (req, res) => {
-    const { song_id } = req.body;
-
-    const likes = await Like.find({ song_id });
-    res.json(likes);
-});
-
-//Favorites
-
+//favorites
 router.post("/favorites", requireToken, async (req, res) => {
-    const favorite = new Favorite(req.body);
+    const { user_id, song_id } = req.body;
+
+    const favorite = new Favorite({ user_id, song_id });
     await favorite.save();
 
     res.json({
@@ -78,39 +65,24 @@ router.post("/favorites", requireToken, async (req, res) => {
     });
 });
 
-router.get("/favorites", requireToken, async (req, res) => {
-    const favorites = await Favorite.find();
+router.get("/favorites/:user_id", requireToken, async (req, res) => {
+    const favorites = await Favorite.find({ user_id: req.params.user_id });
+
     res.json(favorites);
 });
 
-router.get("/favorites/:id", requireToken, async (req, res) => {
-    const favorite = await Favorite.findById(req.params.id);
-    res.json(favorite);
-});
+router.delete("/favorites", requireToken, async (req, res) => {
+    const { user_id, song_id } = req.body;
 
-router.put("/favorites/:id", requireToken, async (req, res) => {
-    const favorite = await Favorite.findByIdAndUpdate(
-        req.params.id,
-        req.body,
-        { new: true }
-    );
-    res.json(favorite);
-});
+    const deleted = await Favorite.findOneAndDelete({ user_id, song_id });
 
-router.delete("/favorites/:id", requireToken, async (req, res) => {
-    await Favorite.findByIdAndDelete(req.params.id);
+    if (!deleted) {
+        return res.status(404).json({ error: "Favorite not found" });
+    }
 
     res.json({
         message: "Favorite deleted"
     });
-});
-
-// Favoritos por usuario
-router.post("/favorites/user", requireToken, async (req, res) => {
-    const { user_id } = req.body;
-
-    const favorites = await Favorite.find({ user_id });
-    res.json(favorites);
 });
 
 module.exports = router;
