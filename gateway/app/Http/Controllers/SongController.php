@@ -22,10 +22,11 @@ class SongController extends Controller
         $response = Http:: withHeaders([
         'Authorization' => env("TOKEN"),
         ])->post(env("SONG_SERVICE"),[
-            "name"=> $request->name,
-            "price" => $request->price,
-            "color"=> $request->color,
-            "stock"=> $request->stock
+            "title"=> $request->title,
+            "artist" => $request->artist,
+            "genre"=> $request->genre,
+            "duration"=> $request->duration,
+            "url" => $request->url
         ]);
         return [
         'status' => $response->status(),
@@ -38,10 +39,11 @@ class SongController extends Controller
     $response = Http::withHeaders([
         'Authorization' => env("TOKEN"),
     ])->put(env("SONG_SERVICE")."/".$id, [
-        "name" => $request->name,
-        "price" => $request->price,
-        "color" => $request->color,
-        "stock" => $request->stock
+        "title" => $request->title,
+        "artist" => $request->artist,
+        "genre" => $request->genre,
+        "duration" => $request->duration,
+        "url" => $request->url
     ]);
 
     return [
