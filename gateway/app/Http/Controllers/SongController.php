@@ -6,12 +6,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Auth;
 
+
 class SongController extends Controller
 {
         public function show_songs(){
         $response = Http::withHeaders([
         'Authorization' => env("TOKEN"),
-        ])->get(env("SONG_SERVICE"));
+        ])->get(env("SONG_SERVICE")."/");
         return [
         'status' => $response->status(),
         'body' => $response->body(),
