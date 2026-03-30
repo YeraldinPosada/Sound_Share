@@ -5,7 +5,7 @@ class Song(models.Model):
     artist = models.CharField(max_length=255)
     genre = models.CharField(max_length=100)
     duration = models.IntegerField()  # duración en segundos
-    url = models.URLField()
+    url = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
