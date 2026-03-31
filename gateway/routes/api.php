@@ -41,4 +41,21 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 
+//Endpoint Interactions 
 
+// Likes
+
+Route::get('/likes/{song_id}', [InteractionController::class, 'getLikesBySong']);
+
+// Favorites
+Route::get('/favorites/{user_id}', [InteractionController::class, 'getFavoritesByUser']);
+
+Route::middleware('auth:sanctum')->group(function () {
+
+    Route::post('/likes', [InteractionController::class, 'createLike']);
+    Route::delete('/likes', [InteractionController::class, 'deleteLike']);
+
+    Route::post('/favorites', [InteractionController::class, 'createFavorite']);
+    Route::delete('/favorites', [InteractionController::class, 'deleteFavorite']);
+
+});

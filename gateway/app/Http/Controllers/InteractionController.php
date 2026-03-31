@@ -16,72 +16,64 @@ class InteractionController extends Controller
     }
 
     // LIKES
-
-    // Crear like
     public function createLike(Request $request)
     {
         $response = Http::withHeaders($this->getHeaders())
-            ->post(env("INTERACTIONS_URL") . "/likes", [
+            ->post(env("INTERACTIONS_SERVICE") . "/likes", [
                 'user_id' => $request->user()->id,
                 'song_id' => $request->song_id
             ]);
 
-        return response()->json($response->json(), $response->status());
+        return response()->json($response->json(), (int) $response->status());
     }
 
-    // Obtener likes por canción
     public function getLikesBySong($song_id)
     {
         $response = Http::withHeaders($this->getHeaders())
-            ->get(env("INTERACTIONS_URL") . "/likes/" . $song_id);
+            ->get(env("INTERACTIONS_SERVICE") . "/likes/" . $song_id);
 
-        return response()->json($response->json(), $response->status());
+        return response()->json($response->json(), (int) $response->status());
     }
 
-    // Eliminar like
     public function deleteLike(Request $request)
     {
         $response = Http::withHeaders($this->getHeaders())
-            ->delete(env("INTERACTIONS_URL") . "/likes", [
+            ->delete(env("INTERACTIONS_SERVICE") . "/likes", [
                 'user_id' => $request->user()->id,
                 'song_id' => $request->song_id
             ]);
 
-        return response()->json($response->json(), $response->status());
+        return response()->json($response->json(), (int) $response->status());
     }
 
-    //FAVORITES
-
-    // Crear favorito
+    // FAVORITES
     public function createFavorite(Request $request)
     {
         $response = Http::withHeaders($this->getHeaders())
-            ->post(env("INTERACTIONS_URL") . "/favorites", [
+            ->post(env("INTERACTIONS_SERVICE") . "/favorites", [
                 'user_id' => $request->user()->id,
                 'song_id' => $request->song_id
             ]);
 
-        return response()->json($response->json(), $response->status());
+        return response()->json($response->json(), (int) $response->status());
     }
 
-    // Obtener favoritos por usuario
     public function getFavoritesByUser($user_id)
     {
         $response = Http::withHeaders($this->getHeaders())
-            ->get(env("INTERACTIONS_URL") . "/favorites/" . $user_id);
+            ->get(env("INTERACTIONS_SERVICE") . "/favorites/" . $user_id);
 
-        return response()->json($response->json(), $response->status());
+        return response()->json($response->json(), (int) $response->status());
     }
 
-    // Eliminar favorito
     public function deleteFavorite(Request $request)
     {
         $response = Http::withHeaders($this->getHeaders())
-            ->delete(env("INTERACTIONS_URL") . "/favorites", [
+            ->delete(env("INTERACTIONS_SERVICE") . "/favorites", [
                 'user_id' => $request->user()->id,
                 'song_id' => $request->song_id
             ]);
 
-        return response()->json($response->json(), $response->status());
+        return response()->json($response->json(), (int) $response->status());
     }
 }
