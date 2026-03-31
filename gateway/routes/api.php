@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SongController;
 use App\Http\Controllers\PlaylistController;
+use App\Http\Controllers\InteractionController;
 
 
 Route::get('/user', function (Request $request) {
@@ -36,5 +37,25 @@ Route::middleware('auth:sanctum')->group(function () {
     // Canciones — PUT para agregar, DELETE con índice para eliminar
     Route::put('/playlists/{playlist_id}/songs', [PlaylistController::class, 'addSong']);
     Route::delete('/playlists/{playlist_id}/songs/{index}', [PlaylistController::class, 'removeSong']);
+
+});
+
+
+//Endpoint Interactions 
+
+// Likes
+
+Route::get('/likes/{song_id}', [InteractionController::class, 'getLikesBySong']);
+
+// Favorites
+Route::get('/favorites/{user_id}', [InteractionController::class, 'getFavoritesByUser']);
+
+Route::middleware('auth:sanctum')->group(function () {
+
+    Route::post('/likes', [InteractionController::class, 'createLike']);
+    Route::delete('/likes', [InteractionController::class, 'deleteLike']);
+
+    Route::post('/favorites', [InteractionController::class, 'createFavorite']);
+    Route::delete('/favorites', [InteractionController::class, 'deleteFavorite']);
 
 });
