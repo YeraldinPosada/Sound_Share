@@ -22,7 +22,7 @@ class InteractionController extends Controller
     {
         $response = Http::withHeaders($this->getHeaders())
             ->post(env("INTERACTIONS_URL") . "/likes", [
-                'user_id' => $request->user_id,
+                'user_id' => $request->user()->id,
                 'song_id' => $request->song_id
             ]);
 
@@ -43,7 +43,7 @@ class InteractionController extends Controller
     {
         $response = Http::withHeaders($this->getHeaders())
             ->delete(env("INTERACTIONS_URL") . "/likes", [
-                'user_id' => $request->user_id,
+                'user_id' => $request->user()->id,
                 'song_id' => $request->song_id
             ]);
 
@@ -57,7 +57,7 @@ class InteractionController extends Controller
     {
         $response = Http::withHeaders($this->getHeaders())
             ->post(env("INTERACTIONS_URL") . "/favorites", [
-                'user_id' => $request->user_id,
+                'user_id' => $request->user()->id,
                 'song_id' => $request->song_id
             ]);
 
@@ -78,7 +78,7 @@ class InteractionController extends Controller
     {
         $response = Http::withHeaders($this->getHeaders())
             ->delete(env("INTERACTIONS_URL") . "/favorites", [
-                'user_id' => $request->user_id,
+                'user_id' => $request->user()->id,
                 'song_id' => $request->song_id
             ]);
 

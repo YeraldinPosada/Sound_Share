@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\SongController;
 use App\Http\Controllers\PlaylistController;
+use App\Http\Controllers\InteractionController;
 
 
 Route::get('/user', function (Request $request) {
@@ -38,3 +39,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/playlists/{playlist_id}/songs/{index}', [PlaylistController::class, 'removeSong']);
 
 });
+
+
+
