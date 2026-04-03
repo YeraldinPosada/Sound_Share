@@ -14,6 +14,22 @@ class PlaylistController extends Controller
         ];
     }
 
+    private function validateSongs($songs){
+        if (!is_array($songs) || count($songs) === 0) return null;
+
+        foreach ($songs as $song_id) {
+            $response = Http::withHeaders($this->headers())
+                ->get(env("SONG_SERVICE") . "/" . $song_id);
+
+            if ($response->failed()) {
+                return response()->json([
+                    "error" => "La canción con ID $song_id no existe"
+                ], 404);
+            }
+        }
+
+        return null;
+    }
     // Trae TODAS las playlists
     public function index(){
         $response = Http::withHeaders($this->headers())
@@ -25,6 +41,8 @@ class PlaylistController extends Controller
     // Crear playlist
     public function store(Request $request){
         $user = Auth::user();
+        $error = $this->validateSongs($request->songs);
+        if ($error) return $error;
 
         $response = Http::withHeaders($this->headers())
             ->post(env("PLAYLIST_SERVICE"), [
@@ -39,7 +57,8 @@ class PlaylistController extends Controller
     // Actualizar playlist
     public function update(Request $request, $id){
         $user = Auth::user();
-
+        $error = $this->validateSongs($request->songs);
+        if ($error) return $error;
         $response = Http::withHeaders($this->headers())
             ->put(env("PLAYLIST_SERVICE")."/".$id, [
                 "name"    => $request->name,
@@ -58,18 +77,33 @@ class PlaylistController extends Controller
         return response()->json(null, $response->status());
     }
 
-    // Agregar canción — ahora con title y artist (PUT como Flask)
+    // Agregar canción 
     public function addSong(Request $request, $playlist_id){
+
+        if (!$request->song_id) {
+            return response()->json([
+                "error" => "song_id es requerido"
+            ], 400);
+        }
+
+        $responseSong = Http::withHeaders($this->headers())
+            ->get(env("SONG_SERVICE") . "/" . $request->song_id);
+
+        if ($responseSong->failed()) {
+            return response()->json([
+                "error" => "La canción no existe"
+            ], 404);
+        }
+
         $response = Http::withHeaders($this->headers())
             ->put(env("PLAYLIST_SERVICE")."/".$playlist_id."/songs", [
-                "title"  => $request->title,
-                "artist" => $request->artist
+                "song_id" => $request->song_id
             ]);
 
         return response()->json($response->json(), $response->status());
     }
 
-    // Quitar canción por índice (como Flask)
+    // Quitar canción por índice 
     public function removeSong($playlist_id, $index){
         $response = Http::withHeaders($this->headers())
             ->delete(env("PLAYLIST_SERVICE")."/".$playlist_id."/songs/".$index);
