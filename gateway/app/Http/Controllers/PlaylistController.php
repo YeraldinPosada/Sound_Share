@@ -37,7 +37,7 @@ class PlaylistController extends Controller
 
         return response()->json($response->json(), $response->status());
     }
-
+ 
     // Crear playlist
     public function store(Request $request){
         $user = Auth::user();
