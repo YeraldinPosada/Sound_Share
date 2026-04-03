@@ -15,9 +15,31 @@ class InteractionController extends Controller
         ];
     }
 
+    private function validateSong($song_id){
+        if (!$song_id) {
+            return response()->json([
+                "error" => "song_id es requerido"
+            ], 400);
+        }
+
+        $response = Http::withHeaders($this->getHeaders())
+            ->get(env("SONG_SERVICE") . "/" . $song_id);
+
+        if ($response->failed()) {
+            return response()->json([
+                "error" => "La canción no existe"
+            ], 404);
+        }
+
+        return null;
+    }
+
     // LIKES
     public function createLike(Request $request)
     {
+        $error = $this->validateSong($request->song_id);
+        if ($error) return $error;
+
         $response = Http::withHeaders($this->getHeaders())
             ->post(env("INTERACTIONS_SERVICE") . "/likes", [
                 'user_id' => $request->user()->id,
@@ -37,6 +59,9 @@ class InteractionController extends Controller
 
     public function deleteLike(Request $request)
     {
+        $error = $this->validateSong($request->song_id);
+        if ($error) return $error;
+
         $response = Http::withHeaders($this->getHeaders())
             ->delete(env("INTERACTIONS_SERVICE") . "/likes", [
                 'user_id' => $request->user()->id,
@@ -49,6 +74,9 @@ class InteractionController extends Controller
     // FAVORITES
     public function createFavorite(Request $request)
     {
+        $error = $this->validateSong($request->song_id);
+        if ($error) return $error;
+
         $response = Http::withHeaders($this->getHeaders())
             ->post(env("INTERACTIONS_SERVICE") . "/favorites", [
                 'user_id' => $request->user()->id,
@@ -68,6 +96,9 @@ class InteractionController extends Controller
 
     public function deleteFavorite(Request $request)
     {
+        $error = $this->validateSong($request->song_id);
+        if ($error) return $error;
+
         $response = Http::withHeaders($this->getHeaders())
             ->delete(env("INTERACTIONS_SERVICE") . "/favorites", [
                 'user_id' => $request->user()->id,

@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
-class DownloadController extends Controller
+class LyricsController extends Controller
 {
     private function getHeaders()
     {
@@ -34,29 +34,28 @@ class DownloadController extends Controller
         return null;
     }
 
-    // Crear descarga
     public function store(Request $request)
-    {                  
+    {                   
+
         $error = $this->validateSong($request->song_id);
         if ($error) return $error;
-
+        
         $response = Http::withHeaders($this->getHeaders())
-            ->post(env("DOWNLOAD_SERVICE"), [
-                'user_id' => $request->user()->id,
-                'song_id' => $request->song_id
+            ->post(env("LYRICS_SERVICE"), [
+                'song_id' => $request->song_id,
+                'content' => $request->content
             ]);
 
         return response()->json(
             $response->json(),
             (int) $response->status()
         );
-        }
+    }
 
-    // Obtener todas las descargas
     public function index()
     {
         $response = Http::withHeaders($this->getHeaders())
-            ->get(env("DOWNLOAD_SERVICE"));
+            ->get(env("LYRICS_SERVICE"));
 
         return response()->json(
             $response->json(),
@@ -64,11 +63,10 @@ class DownloadController extends Controller
         );
     }
 
-    // Obtener descargas por usuario
-    public function getByUser($user_id)
+    public function show($id)
     {
         $response = Http::withHeaders($this->getHeaders())
-            ->get(env("DOWNLOAD_SERVICE") . "/user/" . $user_id);
+            ->get(env("LYRICS_SERVICE") . "/" . $id);
 
         return response()->json(
             $response->json(),
@@ -76,14 +74,23 @@ class DownloadController extends Controller
         );
     }
 
-    // Obtener descargas por canción
-    public function getBySong($song_id)
-    {   
-        $error = $this->validateSong($song_id);
-        if ($error) return $error;
-
+    public function update(Request $request, $id)
+    {
         $response = Http::withHeaders($this->getHeaders())
-            ->get(env("DOWNLOAD_SERVICE") . "/song/" . $song_id);
+            ->put(env("LYRICS_SERVICE") . "/" . $id, [
+                'content' => $request->content
+            ]);
+
+        return response()->json(
+            $response->json(),
+            (int) $response->status()
+        );
+    }
+
+    public function destroy($id)
+    {
+        $response = Http::withHeaders($this->getHeaders())
+            ->delete(env("LYRICS_SERVICE") . "/" . $id);
 
         return response()->json(
             $response->json(),
