@@ -5,7 +5,7 @@ TEST_EMAIL    = "Susyy@gmaill.com"
 TEST_PASSWORD = "1234"
 
 SAMPLE_SONG_IDS   = [1, 5, 4]
-SAMPLE_LYRICS_IDS = ["Ku4qjrsD0KZsaY9SxN7p", "cwzXIV0KZ7KMJMj4pcAX", "lrDnjtxaJ1aEYPFZ6Nyd"]
+SAMPLE_LYRICS_IDS = [2, 20, 24]
 
 
 class LyricsUser(HttpUser):
