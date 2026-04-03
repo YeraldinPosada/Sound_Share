@@ -7,6 +7,7 @@ use App\Http\Controllers\SongController;
 use App\Http\Controllers\PlaylistController;
 use App\Http\Controllers\InteractionController;
 use App\Http\Controllers\DownloadController;
+use App\Http\Controllers\LyricsController;
 
 
 
@@ -69,3 +70,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/downloads/user/{user_id}', [DownloadController::class, 'getByUser']);
     Route::get('/downloads/song/{song_id}', [DownloadController::class, 'getBySong']);
 });
+
+//Endpoints para Lyrics
+    Route::get('/lyrics', [LyricsController::class, 'index']);        // GET all
+    Route::get('/lyrics/{id}', [LyricsController::class, 'show']);     // GET by id
+    Route::post('/lyrics', [LyricsController::class, 'store']);       // CREATE
+    Route::put('/lyrics/{id}', [LyricsController::class, 'update']);   // UPDATE
+    Route::delete('/lyrics/{id}', [LyricsController::class, 'destroy']); // DELETE

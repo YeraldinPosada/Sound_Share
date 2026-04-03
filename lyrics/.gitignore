@@ -5,3 +5,5 @@ firebase_key.json
 venv/
 ENV/
 node_modules/
+__pycache__/
+*.pyc
