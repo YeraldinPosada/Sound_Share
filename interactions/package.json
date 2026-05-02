@@ -7,11 +7,20 @@
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --runInBand"
   },
   "dependencies": {
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "mongoose": "^9.3.0"
+  },
+  "devDependencies": {
+    "jest": "^30.3.0",
+    "mongodb-memory-server": "^11.1.0",
+    "supertest": "^7.2.2"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testTimeout": 30000
   }
 }
