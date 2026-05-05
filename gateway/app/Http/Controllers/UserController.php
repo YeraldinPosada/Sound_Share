@@ -28,7 +28,7 @@ class UserController extends Controller
         $user->resquestion = $request->resquestion;
         $user->save();
 
-        return response()->json("Usuario creado");
+        return response()->json(["mensaje" => "Usuario creado"]);
     }
 
     public function login(Request $request)
