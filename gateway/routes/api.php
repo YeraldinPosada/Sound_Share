@@ -22,11 +22,7 @@ Route::post('/logout', [UserController::class, 'logout'])->middleware('auth:sanc
 Route::post('/password_reset', [UserController::class, 'password_reset']);
 
 
-//Endpoints de Songs
-Route::get('/songs', [SongController::class, 'show_songs']);
-Route::post('/songs', [SongController::class, 'create_song']);
-Route::put('/songs/{id}', [SongController::class, 'update_song']);
-Route::delete('/songs/{id}', [SongController::class, 'delete_song']);
+
 
 //Endpoints Playlist
 Route::middleware('auth:sanctum')->group(function () {
@@ -41,19 +37,27 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/playlists/{playlist_id}/songs', [PlaylistController::class, 'addSong']);
     Route::delete('/playlists/{playlist_id}/songs/{index}', [PlaylistController::class, 'removeSong']);
 
+
+    //Endpoints de Songs
+    Route::get('/songs', [SongController::class, 'show_songs']);
+    Route::post('/songs', [SongController::class, 'create_song']);
+    Route::put('/songs/{id}', [SongController::class, 'update_song']);
+    Route::delete('/songs/{id}', [SongController::class, 'delete_song']);
+
 });
 
 
 //Endpoint Interactions 
 
-// Likes
 
-Route::get('/likes/{song_id}', [InteractionController::class, 'getLikesBySong']);
-
-// Favorites
-Route::get('/favorites/{user_id}', [InteractionController::class, 'getFavoritesByUser']);
 
 Route::middleware('auth:sanctum')->group(function () {
+    // Likes
+
+    Route::get('/likes/{song_id}', [InteractionController::class, 'getLikesBySong']);
+
+    // Favorites
+    Route::get('/favorites/{user_id}', [InteractionController::class, 'getFavoritesByUser']);
 
     Route::post('/likes', [InteractionController::class, 'createLike']);
     Route::delete('/likes', [InteractionController::class, 'deleteLike']);
