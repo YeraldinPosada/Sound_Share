@@ -1,4 +1,3 @@
-version: '3.8'
 
 services:
   mysql:
@@ -37,38 +36,38 @@ services:
 
 
 
-songs:
-    build:
-      context: ./songs
-      dockerfile: Dockerfile
-    image: soundshare_songs
-    ports:
-      - "8002:8002"
-    env_file:
-      - ./songs/.env
-    depends_on:
-      mysql:
-        condition: service_healthy
-    networks:
-      - soundshare_network
+  songs:
+      build:
+        context: ./songs
+        dockerfile: Dockerfile
+      image: soundshare_songs
+      ports:
+        - "8002:8002"
+      env_file:
+        - ./songs/.env
+      depends_on:
+        mysql:
+          condition: service_healthy
+      networks:
+        - soundshare_network
 
 
-lyrics:
-    build:
-      context: ./lyrics
-      dockerfile: Dockerfile
-    image: soundshare_lyrics
-    ports:
-      - "5001:5001"
-    env_file:
-      - ./lyrics/.env
-    depends_on:
-      mysql:
-        condition: service_healthy
-      songs:
-        condition: service_started
-    networks:
-      - soundshare_network
+  lyrics:
+      build:
+        context: ./lyrics
+        dockerfile: Dockerfile
+      image: soundshare_lyrics
+      ports:
+        - "5001:5001"
+      env_file:
+        - ./lyrics/.env
+      depends_on:
+        mysql:
+          condition: service_healthy
+        songs:
+          condition: service_started
+      networks:
+        - soundshare_network
 
   
 volumes:
