@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    env_file:
+      - .env
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "3306:3306"
+    networks:
+      - soundshare_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 180s
+
+
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    image: soundshare_gateway   
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./gateway/.env
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - soundshare_network
+  
+volumes:
+  mysql_data:
+ 
+networks:
+  soundshare_network:
+    driver: bridge
