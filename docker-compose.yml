@@ -34,6 +34,24 @@ services:
         condition: service_healthy
     networks:
       - soundshare_network
+
+
+
+songs:
+    build:
+      context: ./songs
+      dockerfile: Dockerfile
+    image: soundshare_songs
+    ports:
+      - "8002:8002"
+    env_file:
+      - ./songs/.env
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - soundshare_network
+
   
 volumes:
   mysql_data:
