@@ -100,17 +100,52 @@ services:
     ports:
       - "3000:3000"
     env_file:
-      - ./interactions/.env
+      - ./interactions/.env 
     depends_on:
       - mongodb
     networks:
       - soundshare_network
+  
+  postgres:
+    image: postgres:15
+    container_name: soundshare_postgres
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      - soundshare_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  downloads:
+    build:
+      context: ./downloads_service
+      dockerfile: Dockerfile
+    image: soundshare_downloads  
+    ports:
+      - "8001:8001"
+    env_file:
+      - ./downloads_service/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - soundshare_network
+    
  
 
   
 volumes:
   mysql_data:
   mongo_data:
+  postgres_data:
  
 networks:
   soundshare_network:
