@@ -64,10 +64,24 @@ services:
       depends_on:
         mysql:
           condition: service_healthy
-        songs:
-          condition: service_started
       networks:
         - soundshare_network
+
+
+  playlist:
+    build:
+      context: ./playlist
+      dockerfile: Dockerfile
+    image: soundshare_playlist
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./playlist/.env
+    volumes:
+      - ./playlist/serviceAccountKey.json:/app/serviceAccountKey.json:ro
+    networks:
+      - soundshare_network
+ 
 
   
 volumes:
