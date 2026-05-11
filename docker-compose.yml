@@ -1,4 +1,3 @@
-
 services:
   mysql:
     image: mysql:8.0
@@ -81,11 +80,37 @@ services:
       - ./playlist/serviceAccountKey.json:/app/serviceAccountKey.json:ro
     networks:
       - soundshare_network
+
+  mongodb:
+    image: mongo:6.0
+    container_name: mongo
+    restart: always
+    volumes:
+      - mongo_data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - soundshare_network
+
+  interactions:
+    build:
+      context: ./interactions
+      dockerfile: Dockerfile
+    image: soundshare_interactions
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./interactions/.env
+    depends_on:
+      - mongodb
+    networks:
+      - soundshare_network
  
 
   
 volumes:
   mysql_data:
+  mongo_data:
  
 networks:
   soundshare_network:
