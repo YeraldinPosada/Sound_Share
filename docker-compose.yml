@@ -1,0 +1,152 @@
+services:
+  mysql:
+    image: mysql:8.0
+    env_file:
+      - .env
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "3306:3306"
+    networks:
+      - soundshare_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 180s
+
+
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    image: soundshare_gateway   
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./gateway/.env
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - soundshare_network
+
+
+
+  songs:
+      build:
+        context: ./songs
+        dockerfile: Dockerfile
+      image: soundshare_songs
+      ports:
+        - "8002:8002"
+      env_file:
+        - ./songs/.env
+      depends_on:
+        mysql:
+          condition: service_healthy
+      networks:
+        - soundshare_network
+
+
+  lyrics:
+      build:
+        context: ./lyrics
+        dockerfile: Dockerfile
+      image: soundshare_lyrics
+      ports:
+        - "5001:5001"
+      env_file:
+        - ./lyrics/.env
+      depends_on:
+        mysql:
+          condition: service_healthy
+      networks:
+        - soundshare_network
+
+
+  playlist:
+    build:
+      context: ./playlist
+      dockerfile: Dockerfile
+    image: soundshare_playlist
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./playlist/.env
+    volumes:
+      - ./playlist/serviceAccountKey.json:/app/serviceAccountKey.json:ro
+    networks:
+      - soundshare_network
+
+  mongodb:
+    image: mongo:6.0
+    container_name: mongo
+    restart: always
+    volumes:
+      - mongo_data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - soundshare_network
+
+  interactions:
+    build:
+      context: ./interactions
+      dockerfile: Dockerfile
+    image: soundshare_interactions
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./interactions/.env 
+    depends_on:
+      - mongodb
+    networks:
+      - soundshare_network
+  
+  postgres:
+    image: postgres:15
+    container_name: soundshare_postgres
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      - soundshare_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  downloads:
+    build:
+      context: ./downloads_service
+      dockerfile: Dockerfile
+    image: soundshare_downloads  
+    ports:
+      - "8001:8001"
+    env_file:
+      - ./downloads_service/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - soundshare_network
+    
+ 
+
+  
+volumes:
+  mysql_data:
+  mongo_data:
+  postgres_data:
+ 
+networks:
+  soundshare_network:
+    driver: bridge

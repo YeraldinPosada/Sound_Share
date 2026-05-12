@@ -1,0 +1,10 @@
+CREATE DATABASE IF NOT EXISTS gateway;
+CREATE DATABASE IF NOT EXISTS songs;
+CREATE DATABASE IF NOT EXISTS lyrics;
+
+
+GRANT ALL PRIVILEGES ON gateway.* TO 'soundshare'@'%';
+GRANT ALL PRIVILEGES ON songs.* TO 'soundshare'@'%';
+GRANT ALL PRIVILEGES ON lyrics.* TO 'soundshare'@'%';
+
+FLUSH PRIVILEGES;
