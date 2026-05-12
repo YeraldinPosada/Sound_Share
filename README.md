@@ -135,5 +135,217 @@ Pruebas — Locust fue efectivo para identificar el límite del entorno. El hall
 Escalabilidad — La arquitectura está diseñada para escalar. Los mismos servicios desplegados en contenedores con balanceo de carga soportarían fácilmente varios cientos de usuarios concurrentes. El siguiente paso natural sería containerizar cada servicio con Docker y orquestarlos con Kubernetes, añadiendo caché (Redis) para las consultas frecuentes al Songs Service.
 ---
 
+# Despliegue con Docker
+
+## Contexto general
+
+El sistema Sound Share fue containerizado completamente utilizando Docker y Docker Compose, siguiendo una arquitectura basada en microservicios y el principio de un contenedor por servicio.
+
+Cada microservicio posee:
+
+- Su propio Dockerfile
+- Variables de entorno independientes mediante archivos `.env`
+- Dependencias aisladas
+- Comunicación interna mediante red Docker
+
+Todos los contenedores se conectan a través de una red bridge llamada `soundshare_network`.
+
+Dentro de esta red, los servicios se comunican utilizando el nombre del contenedor en lugar de `localhost`.
+
+---
+
+## Requisitos previos
+
+Antes de desplegar el proyecto es necesario tener instalado:
+
+- Docker
+- Docker Compose
+
+Versiones recomendadas:
+
+```bash
+Docker >= 24
+Docker Compose >= 2
+```
+
+Verificar instalación:
+
+```bash
+docker --version
+docker compose version
+```
+
+---
+
+## Clonar el proyecto
+
+```bash
+git clone <repositorio>
+cd sound_share
+```
+
+---
+
+## Configuración de variables de entorno
+
+Cada microservicio contiene su propio archivo `.env`.
+
+Es importante verificar especialmente:
+
+- Credenciales de bases de datos
+- URLs internas de microservicios
+- Tokens de Firebase
+- Puertos expuestos
+
+Ejemplo:
+
+```env
+DB_HOST=mysql
+DB_PORT=3306
+```
+
+Los servicios deben usar el nombre del contenedor como host y no `localhost`.
+
+---
+
+## Infraestructura de bases de datos
+
+El sistema utiliza tres motores de bases de datos desplegados como contenedores independientes:
+
+| Motor | Servicio | Bases de datos | Puerto |
+|---|---|---|---|
+| MySQL 8.0 | mysql | gateway, songs, lyrics | 3306 |
+| PostgreSQL 15 | postgres | downloads | 5432 |
+| MongoDB 7 | mongodb | interactions | 27017 |
+
+Las bases de datos MySQL son inicializadas automáticamente mediante:
+
+```text
+init/mysql/init.sql
+```
+
+Los datos persisten mediante volúmenes Docker:
+
+- `mysql_data`
+- `postgres_data`
+- `mongo_data`
+
+---
+
+
+| Servicio | Configuración principal |
+|---|---|
+| gateway | URLs de microservicios usando nombres de contenedores |
+| songs | `DB_HOST=mysql` y credenciales MySQL |
+| downloads | `DB_CONNECTION=pgsql`, `DB_HOST=postgres` |
+| lyrics | `DATABASE_URL` apuntando a `mysql` |
+| interactions | `MONGO_URI` apuntando a `mongodb` |
+| playlist | Configuración Firebase y token corregido |
+
+---
+
+## Construcción de contenedores
+
+Para construir todas las imágenes:
+
+```bash
+docker compose build
+```
+
+---
+
+## Levantar el sistema
+
+Para iniciar todos los microservicios:
+
+```bash
+docker compose up
+```
+
+Para ejecutarlos en segundo plano:
+
+```bash
+docker compose up -d
+```
+
+---
+
+## Orden de arranque y dependencias
+
+El sistema utiliza `depends_on` junto a healthchecks para controlar el orden de inicialización.
+
+Orden efectivo de arranque:
+
+```text
+MySQL / PostgreSQL / MongoDB
+            ↓
+      Gateway + Songs
+            ↓
+Lyrics + Downloads + Interactions + Playlist
+```
+
+---
+
+## Microservicios desplegados
+
+| Servicio | Tecnología | Puerto |
+|---|---|---|
+| gateway | Laravel | 8000 |
+| songs | Django | 8002 |
+| playlist | Flask + Firebase | 5000 |
+| interactions | Express + MongoDB | 3000 |
+| downloads | Laravel + PostgreSQL | 8001 |
+| lyrics | Flask + MySQL | 5001 |
+
+---
+
+## Verificación del despliegue
+
+Ver contenedores activos:
+
+```bash
+docker compose ps
+```
+
+Ver logs generales:
+
+```bash
+docker compose logs
+```
+
+Ver logs de un servicio específico:
+
+```bash
+docker compose logs -f songs
+```
+
+---
+
+## Detener el sistema
+
+```bash
+docker compose down
+```
+
+Eliminar también los volúmenes:
+
+```bash
+docker compose down -v
+```
+
+---
+
+## Reconstrucción completa
+
+En caso de cambios en Dockerfiles o dependencias:
+
+```bash
+docker compose down
+docker compose build --no-cache
+docker compose up -d
+```
+
+
+
 **[Documentación completa → DOCS.md](./docs/SoundShare_Documentacion_Tecnica.pdf)**
 
